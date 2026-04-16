@@ -81,6 +81,7 @@ DerivedDataCache/*
 
 # Rider / JetBrains
 .idea/
+*.DotSettings.user
 
 # OS junk
 .DS_Store
