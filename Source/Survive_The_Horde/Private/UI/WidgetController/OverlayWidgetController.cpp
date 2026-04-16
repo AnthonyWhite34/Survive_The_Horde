@@ -24,16 +24,41 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	const UMyAttributeSet* MyAttributeSet = CastChecked<UMyAttributeSet>(AttributeSet);
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MyAttributeSet->GetHealthAttribute()).AddUObject(this, &UOverlayWidgetController::HealthChanged);
+		//instead of AddUObject well call AddLambda
+		//MyAttributeSet->GetHealthAttribute()).AddUObject(this, &UOverlayWidgetController::HealthChanged);
+		MyAttributeSet->GetHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}	
+		);
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MyAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UOverlayWidgetController::MaxHealthChanged);
+		//MyAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UOverlayWidgetController::MaxHealthChanged);
+		MyAttributeSet->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			}	
+		);
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MyAttributeSet->GetManaAttribute()).AddUObject(this, &UOverlayWidgetController::MaxManaChanged);
+		//MyAttributeSet->GetManaAttribute()).AddUObject(this, &UOverlayWidgetController::MaxManaChanged);
+		MyAttributeSet->GetManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+			{
+				OnManaChanged.Broadcast(Data.NewValue);
+			}	
+		);
 	
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MyAttributeSet->GetMaxManaAttribute()).AddUObject(this, &UOverlayWidgetController::MaxManaChanged);
+		//MyAttributeSet->GetMaxManaAttribute()).AddUObject(this, &UOverlayWidgetController::MaxManaChanged);
+		MyAttributeSet->GetMaxManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxManaChanged.Broadcast(Data.NewValue);
+			}	
+		);
 	
 	Cast<UMyAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
 		//creating a lambda to effect asset tags on the ability system component.
@@ -60,11 +85,12 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	
 }
 
-
+/* No longer need after using lambda
 void UOverlayWidgetController::HealthChanged(const FOnAttributeChangeData& Data) const
 {
 	OnHealthChanged.Broadcast(Data.NewValue);
 }
+
 
 void UOverlayWidgetController::MaxHealthChanged(const FOnAttributeChangeData& Data) const
 {
@@ -80,3 +106,4 @@ void UOverlayWidgetController::MaxManaChanged(const FOnAttributeChangeData& Data
 {
 	OnMaxManaChanged.Broadcast(Data.NewValue);
 }
+*/
