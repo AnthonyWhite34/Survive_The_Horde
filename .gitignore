@@ -73,3 +73,33 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+
+# =========================
+# ADDITIONS (do not remove originals)
+# =========================
+
+# Rider / JetBrains
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Better folder ignores (covers everything inside cleanly)
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+
+# Plugin generated folders (redundant safety)
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+
+# Prevent accidental large archives/build dumps
+*.zip
+*.rar
+*.7z
+
+# Logs
+*.log
