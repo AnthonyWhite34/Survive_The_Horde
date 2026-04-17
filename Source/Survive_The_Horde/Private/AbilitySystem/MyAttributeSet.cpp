@@ -23,6 +23,28 @@ void UMyAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME_CONDITION_NOTIFY(UMyAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
+void UMyAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+	
+	if (Attribute == GetHealthAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Health: %f"), NewValue)
+	}
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MaxHealth: %f"), NewValue)
+	}
+	if (Attribute == GetManaAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Mana: %f"), NewValue)
+	}
+	if (Attribute == GetMaxManaAttribute())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MaxMana: %f"), NewValue)
+	}
+}
+
 void UMyAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMyAttributeSet, Health, OldHealth);

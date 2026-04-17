@@ -24,6 +24,8 @@ class SURVIVE_THE_HORDE_API UMyAttributeSet : public UAttributeSet
 	//function we must override if we want to Replicate any variables.
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UMyAttributeSet, Health);
