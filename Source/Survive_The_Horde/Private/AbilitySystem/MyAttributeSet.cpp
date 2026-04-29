@@ -12,9 +12,7 @@
 UMyAttributeSet::UMyAttributeSet()
 {
 	InitHealth(10.f);
-	InitMaxHealth(100.f);
 	InitMana(10.f);
-	InitMaxMana(50.f);
 }
 
 void UMyAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -86,14 +84,14 @@ void UMyAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		//placing a clamp after the effect executes, ensuring our attribute doesnt go out of bounds. 
+		//placing a clamp after the effect executes, ensuring our attribute doesn't go out of bounds. 
 		GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, FString::Printf(TEXT("Health: %f"), GetHealth()));
-		//SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
 	}
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, FString::Printf(TEXT("Mana: %f"), GetMana()));
-		//SetMana(FMath::Clamp(GetMana(), 0.f,GetMaxMana()));
+		SetMana(FMath::Clamp(GetMana(), 0.f,GetMaxMana()));
 	}
 }
 

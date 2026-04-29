@@ -56,5 +56,5 @@ void APlayerCharacter::InitAbilityActorInfo()
 			STH_HUD->InitOverlay(PlayerCharacterController, MyPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
-	InitializePrimaryAttributes();
+	InitializeDefaultAttributes();
 }
