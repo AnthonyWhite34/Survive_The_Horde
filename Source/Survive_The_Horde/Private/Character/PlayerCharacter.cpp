@@ -1,11 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerCharacter.h"
+
+#include "Character/PlayerCharacter.h"
 
 #include "AbilitySystemComponent.h"
-#include "MyPlayerState.h"
-#include "PlayerCharacterController.h"
+#include "Player/MyPlayerState.h"
+#include "Player/PlayerCharacterController.h"
 #include "AbilitySystem/MyAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/STH_HUD.h"
@@ -38,6 +39,15 @@ void APlayerCharacter::OnRep_PlayerState()
 	
 	// Init  ability actor info for the Clients
 	InitAbilityActorInfo();
+}
+
+int32 APlayerCharacter::GetPlayerLevel()
+{
+	AMyPlayerState* MyPlayerState = GetPlayerState<AMyPlayerState>();
+	check(MyPlayerState);
+	
+	
+	return MyPlayerState->GetPlayerLevel();
 }
 
 void APlayerCharacter::InitAbilityActorInfo()

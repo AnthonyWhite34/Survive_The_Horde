@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemyCharacter.h"
+#include "Character/EnemyCharacter.h"
 
 #include "Survive_The_Horde.h"
 #include "AbilitySystem/MyAbilitySystemComponent.h"
@@ -30,6 +30,11 @@ void AEnemyCharacter::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+int32 AEnemyCharacter::GetPlayerLevel()
+{
+	return Level;
 }
 
 void AEnemyCharacter::BeginPlay()

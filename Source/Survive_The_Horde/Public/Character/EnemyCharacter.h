@@ -17,8 +17,14 @@ class SURVIVE_THE_HORDE_API AEnemyCharacter : public ACharacterBase, public IEne
 	AEnemyCharacter();
 	
 public:
+	/* Enemy Interface */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	/* End Enemy Interface */
+	
+	/* Combat Interface */
+	virtual int32 GetPlayerLevel() override;
+	/* End Combat Interface */
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlighted = false;
@@ -26,4 +32,9 @@ public:
 	virtual void BeginPlay() override;
 	
 	virtual void InitAbilityActorInfo() override;
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWRite, Category = "Character Class Defaults")
+    	int32 Level = 1;
+	
 };
