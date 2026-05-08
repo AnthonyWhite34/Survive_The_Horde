@@ -16,6 +16,8 @@ class AMyPlayerState;
 
 APlayerCharacter::APlayerCharacter()
 {
+	OnAttackMontageEnded.BindUObject(this, &APlayerCharacter::AttackMontageEnded);
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f,400.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
@@ -192,6 +194,10 @@ void APlayerCharacter::DoComboAttackEnd()
 
 void APlayerCharacter::DoChargedAttackStart()
 {
+	if (bIsChargingAttack)
+	{
+		return;
+	}
 	// raise the charging attack flag
 	bIsChargingAttack = true;
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "CombatAttacker.h"
 #include "CombatDamageable.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"

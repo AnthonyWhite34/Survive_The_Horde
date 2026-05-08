@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CharacterBase.h"
+#include "CombatAttacker.h"
 #include "Interaction/EnemyInterface.h"
 #include "EnemyCharacter.generated.h"
 

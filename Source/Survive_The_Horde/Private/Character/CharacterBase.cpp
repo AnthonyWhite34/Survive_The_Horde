@@ -2,6 +2,8 @@
 
 
 #include "Character/CharacterBase.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MyAttributeSet.h"
 #include "Components/CapsuleComponent.h"
@@ -44,8 +46,38 @@ void ACharacterBase::ApplyDamage(float Damage, AActor* DamageCauser, const FVect
 			return;
 		}
 
-		const float NewHealth = FMath::Clamp(PreviousHealth - Damage, 0.0f, MyAttributeSet->GetMaxHealth());
-		MyAttributeSet->SetHealth(NewHealth);
+		if (UAbilitySystemComponent* TargetASC = GetAbilitySystemComponent())
+		{
+			UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(DamageCauser);
+			if (!SourceASC)
+			{
+				SourceASC = TargetASC;
+			}
+
+			FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+			EffectContextHandle.AddSourceObject(DamageCauser);
+			EffectContextHandle.AddInstigator(DamageCauser, DamageCauser);
+
+			UGameplayEffect* DamageEffect = NewObject<UGameplayEffect>(GetTransientPackage(), TEXT("MeleeDamageEffect"));
+			DamageEffect->DurationPolicy = EGameplayEffectDurationType::Instant;
+
+			FGameplayModifierInfo HealthModifier;
+			HealthModifier.Attribute = UMyAttributeSet::GetHealthAttribute();
+			HealthModifier.ModifierOp = EGameplayModOp::Additive;
+			HealthModifier.ModifierMagnitude = FScalableFloat(-Damage);
+			DamageEffect->Modifiers.Add(HealthModifier);
+
+			const FGameplayEffectSpec DamageSpec(DamageEffect, EffectContextHandle, 1.0f);
+			TargetASC->ApplyGameplayEffectSpecToSelf(DamageSpec);
+		}
+		else
+		{
+			const float NewHealth = FMath::Clamp(PreviousHealth - Damage, 0.0f, MyAttributeSet->GetMaxHealth());
+			MyAttributeSet->SetHealth(NewHealth);
+		}
+
+		const float NewHealth = MyAttributeSet->GetHealth();
+		
 		ActualDamage = PreviousHealth - NewHealth;
 
 		if (NewHealth <= 0.0f)

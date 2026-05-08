@@ -101,11 +101,13 @@ void APlayerCharacterController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
 	if (ComboAttackAction)
 	{
-		EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ComboAttackPressed);
+		EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Started, this, &APlayerCharacterController::ComboAttackPressed);
 	}
 	if (ChargedAttackAction)
 	{
-		EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ChargedAttackPressed);	
+		EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Started, this, &APlayerCharacterController::ChargedAttackPressed);
+		EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ChargedAttackReleased);
+		EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Canceled, this, &APlayerCharacterController::ChargedAttackReleased);
 	}
 }
 
