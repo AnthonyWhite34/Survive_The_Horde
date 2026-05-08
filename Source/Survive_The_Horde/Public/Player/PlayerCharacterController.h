@@ -25,14 +25,45 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	
-private:
+
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 	
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
 	
+	//delete if Combat dont work
+	
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category ="Input")
+	UInputAction* JumpAction;
+	
+	/** Combo Attack Input Action */
+	UPROPERTY(EditAnywhere, Category ="Input")
+	UInputAction* ComboAttackAction;
+
+	/** Charged Attack Input Action */
+	UPROPERTY(EditAnywhere, Category ="Input")
+	UInputAction* ChargedAttackAction;
+	
+
+	
+private:
+	
+	/** Called for combo attack input */
+	void ComboAttackPressed(const FInputActionValue& InputActionValue);
+
+	/** Called for combo attack input pressed */
+	void ChargedAttackPressed(const FInputActionValue& InputActionValue);
+
+	/** Called for combo attack input released */
+	void ChargedAttackReleased(const FInputActionValue& InputActionValue);
+	
+	//delete end
+	
 	void Move(const FInputActionValue& InputActionValue);
+	
+
 
 	void CursorTrace();
 	

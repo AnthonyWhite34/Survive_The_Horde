@@ -99,6 +99,25 @@ void APlayerCharacterController::SetupInputComponent()
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
+
+}
+
+void APlayerCharacterController::ComboAttackPressed(const FInputActionValue& InputActionValue)
+{
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ComboAttackPressed);
+}
+
+void APlayerCharacterController::ChargedAttackPressed(const FInputActionValue& InputActionValue)
+{
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ChargedAttackPressed);
+}
+
+void APlayerCharacterController::ChargedAttackReleased(const FInputActionValue& InputActionValue)
+{
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ChargedAttackReleased);
 }
 
 void APlayerCharacterController::Move(const FInputActionValue& InputActionValue)

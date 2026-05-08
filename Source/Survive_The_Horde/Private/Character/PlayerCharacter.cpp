@@ -50,6 +50,152 @@ int32 APlayerCharacter::GetPlayerLevel()
 	return MyPlayerState->GetPlayerLevel();
 }
 
+void APlayerCharacter::NotifyEnemiesOfIncomingAttack()
+{
+	// sweep for objects in front of the character to be hit by the attack
+	TArray<FHitResult> OutHits;
+
+	// start at the actor location, sweep forward
+	const FVector TraceStart = GetActorLocation();
+	const FVector TraceEnd = TraceStart + (GetActorForwardVector() * DangerTraceDistance);
+
+	// check for pawn object types only
+	FCollisionObjectQueryParams ObjectParams;
+	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	// use a sphere shape for the sweep
+	FCollisionShape CollisionShape;
+	CollisionShape.SetSphere(DangerTraceRadius);
+
+	// ignore self
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	if (GetWorld()->SweepMultiByObjectType(OutHits, TraceStart, TraceEnd, FQuat::Identity, ObjectParams, CollisionShape, QueryParams))
+	{
+		// iterate over each object hit
+		for (const FHitResult& CurrentHit : OutHits)
+		{
+			// check if we've hit a damageable actor
+			if (ICombatDamageable* Damageable = Cast<ICombatDamageable>(CurrentHit.GetActor()))
+			{
+				// notify the enemy
+				Damageable->NotifyDanger(GetActorLocation(), this);
+			}
+		}
+	}
+}
+
+void APlayerCharacter::CheckChargedAttack()
+{
+	// raise the looped charged attack flag
+	bHasLoopedChargedAttack = true;
+
+	// jump to either the loop or the attack section depending on whether we're still holding the charge button
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->Montage_JumpToSection(bIsChargingAttack ? ChargeLoopSection : ChargeAttackSection, ChargedAttackMontage);
+	}
+}
+
+void APlayerCharacter::DoComboAttackStart()
+{
+	// are we already playing an attack animation?
+	if (bIsAttacking)
+	{
+		// cache the input time so we can check it later
+		CachedAttackInputTime = GetWorld()->GetTimeSeconds();
+
+		return;
+	}
+
+	// perform a combo attack
+	ComboAttack();
+}
+
+void APlayerCharacter::DoComboAttackEnd()
+{
+	// stub
+}
+
+void APlayerCharacter::DoChargedAttackStart()
+{
+	// raise the charging attack flag
+	bIsChargingAttack = true;
+
+	if (bIsAttacking)
+	{
+		// cache the input time so we can check it later
+		CachedAttackInputTime = GetWorld()->GetTimeSeconds();
+
+		return;
+	}
+
+	ChargedAttack();
+}
+
+void APlayerCharacter::DoChargedAttackEnd()
+{
+	// lower the charging attack flag
+	bIsChargingAttack = false;
+
+	// if we've done the charge loop at least once, release the charged attack right away
+	if (bHasLoopedChargedAttack)
+	{
+		CheckChargedAttack();
+	}
+}
+
+void APlayerCharacter::ComboAttack()
+{
+	// raise the attacking flag
+	bIsAttacking = true;
+
+	// reset the combo count
+	ComboCount = 0;
+
+	// notify enemies they are about to be attacked
+	NotifyEnemiesOfIncomingAttack();
+
+	// play the attack montage
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		const float MontageLength = AnimInstance->Montage_Play(ComboAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+
+		// subscribe to montage completed and interrupted events
+		if (MontageLength > 0.0f)
+		{
+			// set the end delegate for the montage
+			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ComboAttackMontage);
+		}
+	}
+
+}
+
+void APlayerCharacter::ChargedAttack()
+{
+	// raise the attacking flag
+	bIsAttacking = true;
+
+	// reset the charge loop flag
+	bHasLoopedChargedAttack = false;
+
+	// notify enemies they are about to be attacked
+	NotifyEnemiesOfIncomingAttack();
+
+	// play the charged attack montage
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		const float MontageLength = AnimInstance->Montage_Play(ChargedAttackMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+
+		// subscribe to montage completed and interrupted events
+		if (MontageLength > 0.0f)
+		{
+			// set the end delegate for the montage
+			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ChargedAttackMontage);
+		}
+	}
+}
 void APlayerCharacter::InitAbilityActorInfo()
 {
 	AMyPlayerState* MyPlayerState = GetPlayerState<AMyPlayerState>();
