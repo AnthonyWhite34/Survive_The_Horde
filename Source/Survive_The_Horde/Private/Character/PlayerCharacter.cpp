@@ -8,6 +8,7 @@
 #include "Player/MyPlayerState.h"
 #include "Player/PlayerCharacterController.h"
 #include "AbilitySystem/MyAbilitySystemComponent.h"
+#include "CombatDamageable.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/STH_HUD.h"
 
@@ -129,18 +130,25 @@ void APlayerCharacter::DoAttackTrace(FName DamageSourceBone)
 
 void APlayerCharacter::CheckCombo()
 {
+	// are we playing a non-charge attack animation?
 	if (bIsAttacking && !bIsChargingAttack)
 	{
-		const UWorld* World = GetWorld();
-		if (World && World->GetTimeSeconds() - CachedAttackInputTime <= ComboInputCacheTimeTolerance)
+		// is the last attack input not stale?
+		if (GetWorld()->GetTimeSeconds() - CachedAttackInputTime <= ComboInputCacheTimeTolerance)
 		{
-			CachedAttackInputTime = -1.0f;
+			// consume the attack input so we don't accidentally trigger it twice
+			CachedAttackInputTime = 0.0f;
+
+			// increase the combo counter
 			++ComboCount;
 
+			// do we still have a combo section to play?
 			if (ComboCount < ComboSectionNames.Num())
 			{
+				// notify enemies they are about to be attacked
 				NotifyEnemiesOfIncomingAttack();
 
+				// jump to the next combo section
 				if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 				{
 					AnimInstance->Montage_JumpToSection(ComboSectionNames[ComboCount], ComboAttackMontage);
@@ -212,10 +220,6 @@ void APlayerCharacter::DoChargedAttackEnd()
 
 void APlayerCharacter::ComboAttack()
 {
-	if (!ComboAttackMontage)
-	{
-		return;
-	}
 	// raise the attacking flag
 	bIsAttacking = true;
 
@@ -236,25 +240,11 @@ void APlayerCharacter::ComboAttack()
 			// set the end delegate for the montage
 			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ComboAttackMontage);
 		}
-		else
-		{
-			bIsAttacking = false;
-		}
 	}
-	else
-	{
-		bIsAttacking = false;
-	}
-
 }
 
 void APlayerCharacter::ChargedAttack()
 {
-	if (!ChargedAttackMontage)
-	{
-		return;
-	}
-	
 	// raise the attacking flag
 	bIsAttacking = true;
 
@@ -275,32 +265,26 @@ void APlayerCharacter::ChargedAttack()
 			// set the end delegate for the montage
 			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ChargedAttackMontage);
 		}
-		else
-		{
-			bIsAttacking = false;
-		}
-	}
-	else
-	{
-		bIsAttacking = false;
 	}
 }
 
 void APlayerCharacter::AttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	// reset the attacking flag
 	bIsAttacking = false;
 
-	const UWorld* World = GetWorld();
-	if (World && World->GetTimeSeconds() - CachedAttackInputTime <= AttackInputCacheTimeTolerance)
+	// check if we have a non-stale cached input
+	if (GetWorld()->GetTimeSeconds() - CachedAttackInputTime <= AttackInputCacheTimeTolerance)
 	{
-		CachedAttackInputTime = -1.0f;
-
+		// are we holding the charged attack button?
 		if (bIsChargingAttack)
 		{
+			// do a charged attack
 			ChargedAttack();
 		}
 		else
 		{
+			// do a regular attack
 			ComboAttack();
 		}
 	}

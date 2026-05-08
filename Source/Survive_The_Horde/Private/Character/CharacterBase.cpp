@@ -28,11 +28,22 @@ UAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
 
 void ACharacterBase::ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
 {
+	if (bIsDead || Damage <= 0.0f)
+	{
+		return;
+	}
+
 	float ActualDamage = 0.0f;
 
 	if (UMyAttributeSet* MyAttributeSet = Cast<UMyAttributeSet>(AttributeSet))
 	{
 		const float PreviousHealth = MyAttributeSet->GetHealth();
+		if (PreviousHealth <= 0.0f)
+		{
+			HandleDeath();
+			return;
+		}
+
 		const float NewHealth = FMath::Clamp(PreviousHealth - Damage, 0.0f, MyAttributeSet->GetMaxHealth());
 		MyAttributeSet->SetHealth(NewHealth);
 		ActualDamage = PreviousHealth - NewHealth;

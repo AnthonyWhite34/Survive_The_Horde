@@ -13,7 +13,7 @@
  * 
  */
 UCLASS()
-class SURVIVE_THE_HORDE_API APlayerCharacter : public ACharacterBase, public ICombatAttacker, public ICombatDamageable
+class SURVIVE_THE_HORDE_API APlayerCharacter : public ACharacterBase, public ICombatAttacker
 {
 	GENERATED_BODY()
 public: 
@@ -25,8 +25,6 @@ public:
 	/* Combat Interface */
 	virtual int32 GetPlayerLevel() override;
 	/* End Combat Interface */
-	
-	//delete start here if below doesn't work, also delete ICombatAttacker, and ICombatDamageable dirived interfaces
 	
 	/** Notifies nearby enemies that an attack is coming so they can react */
 	void NotifyEnemiesOfIncomingAttack();
