@@ -5,6 +5,7 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Character/PlayerCharacter.h"
 #include "Interaction/EnemyInterface.h"
 
 
@@ -97,27 +98,39 @@ void APlayerCharacterController::SetupInputComponent()
 	Super::SetupInputComponent();
 	
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
-
+	if (ComboAttackAction)
+	{
+		EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ComboAttackPressed);
+	}
+	if (ChargedAttackAction)
+	{
+		EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ChargedAttackPressed);	
+	}
 }
 
-void APlayerCharacterController::ComboAttackPressed(const FInputActionValue& InputActionValue)
+void APlayerCharacterController::ComboAttackPressed()
 {
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ComboAttackPressed);
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->DoComboAttackStart();
+	}
 }
 
-void APlayerCharacterController::ChargedAttackPressed(const FInputActionValue& InputActionValue)
+void APlayerCharacterController::ChargedAttackPressed()
 {
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::ChargedAttackPressed);
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->DoChargedAttackStart();
+	}
 }
 
-void APlayerCharacterController::ChargedAttackReleased(const FInputActionValue& InputActionValue)
+void APlayerCharacterController::ChargedAttackReleased()
 {
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(ChargedAttackAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ChargedAttackReleased);
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn()))
+	{
+		PlayerCharacter->DoChargedAttackEnd();
+	}
 }
 
 void APlayerCharacterController::Move(const FInputActionValue& InputActionValue)

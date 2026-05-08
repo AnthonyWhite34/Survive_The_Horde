@@ -4,8 +4,10 @@
 #include "Character/EnemyCharacter.h"
 
 #include "Survive_The_Horde.h"
+#include "AbilitySystemComponent.h"
 #include "AbilitySystem/MyAbilitySystemComponent.h"
 #include "AbilitySystem/MyAttributeSet.h"
+
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -40,8 +42,6 @@ int32 AEnemyCharacter::GetPlayerLevel()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
 }
 
 void AEnemyCharacter::InitAbilityActorInfo()
@@ -49,4 +49,3 @@ void AEnemyCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UMyAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 }
-

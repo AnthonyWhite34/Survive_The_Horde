@@ -86,6 +86,70 @@ void APlayerCharacter::NotifyEnemiesOfIncomingAttack()
 	}
 }
 
+void APlayerCharacter::DoAttackTrace(FName DamageSourceBone)
+{
+	TArray<FHitResult> OutHits;
+	TSet<AActor*> DamagedActors;
+
+	const FVector TraceStart = GetMesh()->GetSocketLocation(DamageSourceBone);
+	const FVector TraceEnd = TraceStart + (GetActorForwardVector() * MeleeTraceDistance);
+
+	FCollisionObjectQueryParams ObjectParams;
+	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
+	ObjectParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+	FCollisionShape CollisionShape;
+	CollisionShape.SetSphere(MeleeTraceRadius);
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	if (GetWorld()->SweepMultiByObjectType(OutHits, TraceStart, TraceEnd, FQuat::Identity, ObjectParams, CollisionShape, QueryParams))
+	{
+		for (const FHitResult& CurrentHit : OutHits)
+		{
+			AActor* HitActor = CurrentHit.GetActor();
+			if (!HitActor || DamagedActors.Contains(HitActor))
+			{
+				continue;
+			}
+
+			if (ICombatDamageable* Damageable = Cast<ICombatDamageable>(HitActor))
+			{
+				DamagedActors.Add(HitActor);
+
+				const FVector Impulse = (CurrentHit.ImpactNormal * -MeleeKnockbackImpulse) + (FVector::UpVector * MeleeLaunchImpulse);
+				Damageable->ApplyDamage(MeleeDamage, this, CurrentHit.ImpactPoint, Impulse);
+
+				DealtDamage(MeleeDamage, CurrentHit.ImpactPoint);
+			}
+		}
+	}
+}
+
+void APlayerCharacter::CheckCombo()
+{
+	if (bIsAttacking && !bIsChargingAttack)
+	{
+		const UWorld* World = GetWorld();
+		if (World && World->GetTimeSeconds() - CachedAttackInputTime <= ComboInputCacheTimeTolerance)
+		{
+			CachedAttackInputTime = -1.0f;
+			++ComboCount;
+
+			if (ComboCount < ComboSectionNames.Num())
+			{
+				NotifyEnemiesOfIncomingAttack();
+
+				if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+				{
+					AnimInstance->Montage_JumpToSection(ComboSectionNames[ComboCount], ComboAttackMontage);
+				}
+			}
+		}
+	}
+}
+
 void APlayerCharacter::CheckChargedAttack()
 {
 	// raise the looped charged attack flag
@@ -148,6 +212,10 @@ void APlayerCharacter::DoChargedAttackEnd()
 
 void APlayerCharacter::ComboAttack()
 {
+	if (!ComboAttackMontage)
+	{
+		return;
+	}
 	// raise the attacking flag
 	bIsAttacking = true;
 
@@ -168,12 +236,25 @@ void APlayerCharacter::ComboAttack()
 			// set the end delegate for the montage
 			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ComboAttackMontage);
 		}
+		else
+		{
+			bIsAttacking = false;
+		}
+	}
+	else
+	{
+		bIsAttacking = false;
 	}
 
 }
 
 void APlayerCharacter::ChargedAttack()
 {
+	if (!ChargedAttackMontage)
+	{
+		return;
+	}
+	
 	// raise the attacking flag
 	bIsAttacking = true;
 
@@ -194,8 +275,43 @@ void APlayerCharacter::ChargedAttack()
 			// set the end delegate for the montage
 			AnimInstance->Montage_SetEndDelegate(OnAttackMontageEnded, ChargedAttackMontage);
 		}
+		else
+		{
+			bIsAttacking = false;
+		}
+	}
+	else
+	{
+		bIsAttacking = false;
 	}
 }
+
+void APlayerCharacter::AttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	bIsAttacking = false;
+
+	const UWorld* World = GetWorld();
+	if (World && World->GetTimeSeconds() - CachedAttackInputTime <= AttackInputCacheTimeTolerance)
+	{
+		CachedAttackInputTime = -1.0f;
+
+		if (bIsChargingAttack)
+		{
+			ChargedAttack();
+		}
+		else
+		{
+			ComboAttack();
+		}
+	}
+}
+
+void APlayerCharacter::OnDamageReceived(float Damage, const FVector& DamageLocation, const FVector& DamageDirection)
+{
+	ReceivedDamage(Damage, DamageLocation, DamageDirection);
+}
+
+
 void APlayerCharacter::InitAbilityActorInfo()
 {
 	AMyPlayerState* MyPlayerState = GetPlayerState<AMyPlayerState>();

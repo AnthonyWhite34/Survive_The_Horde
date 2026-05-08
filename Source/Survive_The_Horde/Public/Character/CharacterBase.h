@@ -24,6 +24,16 @@ public:
 	
 	UAttributeSet* GetAttributeSet() const { return AttributeSet;	}
 	
+	virtual void ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse);
+	
+	virtual void HandleDeath();
+	
+	virtual void ApplyHealing(float Healing, AActor* Healer);
+	
+	virtual void NotifyDanger(const FVector& DangerLocation, AActor* DangerSource);
+	
+	virtual void OnDamageReceived(float Damage, const FVector& DamageLocation, const FVector& DamageDirection);
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

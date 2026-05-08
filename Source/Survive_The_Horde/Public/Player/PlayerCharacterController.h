@@ -32,8 +32,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
 	
-	//delete if Combat dont work
-	
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* JumpAction;
@@ -46,20 +44,20 @@ protected:
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* ChargedAttackAction;
 	
-
+	bool bIsAttacking = false;
 	
+	int32 ComboCount = 0;
+
 private:
 	
 	/** Called for combo attack input */
-	void ComboAttackPressed(const FInputActionValue& InputActionValue);
+	void ComboAttackPressed();
 
 	/** Called for combo attack input pressed */
-	void ChargedAttackPressed(const FInputActionValue& InputActionValue);
+	void ChargedAttackPressed();
 
 	/** Called for combo attack input released */
-	void ChargedAttackReleased(const FInputActionValue& InputActionValue);
-	
-	//delete end
+	void ChargedAttackReleased();
 	
 	void Move(const FInputActionValue& InputActionValue);
 	

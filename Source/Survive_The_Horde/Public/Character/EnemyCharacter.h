@@ -14,9 +14,9 @@ UCLASS()
 class SURVIVE_THE_HORDE_API AEnemyCharacter : public ACharacterBase, public IEnemyInterface
 {
 	GENERATED_BODY()
-	AEnemyCharacter();
-	
+
 public:
+	AEnemyCharacter();
 	/* Enemy Interface */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
@@ -32,6 +32,8 @@ public:
 	virtual void BeginPlay() override;
 	
 	virtual void InitAbilityActorInfo() override;
+	
+
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWRite, Category = "Character Class Defaults")
