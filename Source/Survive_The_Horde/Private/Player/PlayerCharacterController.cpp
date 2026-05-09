@@ -3,6 +3,7 @@
 
 #include "Player/PlayerCharacterController.h"
 
+#include "Camera/PlayerCameraManager.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Character/PlayerCharacter.h"
@@ -19,6 +20,7 @@ void APlayerCharacterController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	
 	CursorTrace();
+	FaceMouseCursor();
 	
 }
 
@@ -99,6 +101,10 @@ void APlayerCharacterController::SetupInputComponent()
 	
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
+	if (LookAction)
+	{
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Look);
+	}
 	if (ComboAttackAction)
 	{
 		EnhancedInputComponent->BindAction(ComboAttackAction, ETriggerEvent::Started, this, &APlayerCharacterController::ComboAttackPressed);
@@ -138,11 +144,13 @@ void APlayerCharacterController::ChargedAttackReleased()
 void APlayerCharacterController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
-	const FRotator Rotation = GetControlRotation();
-	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+	const FRotator CameraRotation = PlayerCameraManager
+		? PlayerCameraManager->GetCameraRotation()
+		: GetControlRotation();
+	const FRotator CameraYawRotation(0.f, CameraRotation.Yaw, 0.f);
 	
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	const FVector ForwardDirection = FRotationMatrix(CameraYawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(CameraYawRotation).GetUnitAxis(EAxis::Y);
 	
 	if (APawn* ControlledPawn = GetPawn<APawn>())
 	{
@@ -151,4 +159,37 @@ void APlayerCharacterController::Move(const FInputActionValue& InputActionValue)
 	}
 }
 
+void APlayerCharacterController::Look(const FInputActionValue& InputActionValue)
+{
+	// The mouse cursor location is already available from the player controller,
+	// so the action value only needs to signal that look input happened.
+	FaceMouseCursor();
+}
+
+void APlayerCharacterController::FaceMouseCursor()
+{
+	APawn* ControlledPawn = GetPawn<APawn>();
+	if (!ControlledPawn)
+	{
+		return;
+	}
+
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (!CursorHit.bBlockingHit)
+	{
+		return;
+	}
+
+	FVector LookDirection = CursorHit.ImpactPoint - ControlledPawn->GetActorLocation();
+	LookDirection.Z = 0.f;
+	if (LookDirection.IsNearlyZero())
+	{
+		return;
+	}
+
+	const FRotator LookRotation = LookDirection.Rotation();
+	SetControlRotation(LookRotation);
+	ControlledPawn->SetActorRotation(LookRotation);
+}
 

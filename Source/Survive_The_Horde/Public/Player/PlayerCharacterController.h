@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
 	
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> LookAction;
+	
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	UInputAction* JumpAction;
@@ -61,7 +64,11 @@ private:
 	
 	void Move(const FInputActionValue& InputActionValue);
 	
-
+	/** Handles look input and rotates the controlled pawn toward the mouse cursor. */
+	void Look(const FInputActionValue& InputActionValue);
+	
+	/** Rotates the controlled pawn toward the current mouse cursor hit point. */
+	void FaceMouseCursor();
 
 	void CursorTrace();
 	
