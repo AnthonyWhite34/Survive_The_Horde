@@ -11,8 +11,6 @@
 
 UMyAttributeSet::UMyAttributeSet()
 {
-	InitHealth(10.f);
-	InitMana(10.f);
 }
 
 void UMyAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
