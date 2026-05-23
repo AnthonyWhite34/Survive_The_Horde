@@ -17,5 +17,5 @@ public:
 	static UMyAssetManager& Get();
 	
 protected:
-	virtual void StartingInitialLoading();
+	virtual void StartInitialLoading() override;
 };

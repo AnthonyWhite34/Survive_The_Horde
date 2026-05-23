@@ -11,7 +11,7 @@ UMyAssetManager& UMyAssetManager::Get()
 	return *MyAssetManager;
 }
 
-void UMyAssetManager::StartingInitialLoading()
+void UMyAssetManager::StartInitialLoading()
 {
 	Super::StartInitialLoading();
 	
