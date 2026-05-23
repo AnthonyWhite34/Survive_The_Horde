@@ -19,9 +19,12 @@ public class Survive_The_Horde : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+			"GameplayTags",
+			"GameplayTasks"
 		});
 
+		
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
 			"GameplayTags",
