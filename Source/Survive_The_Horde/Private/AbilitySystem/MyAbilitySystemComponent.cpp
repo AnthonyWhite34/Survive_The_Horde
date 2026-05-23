@@ -14,13 +14,6 @@ void UMyAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UMyAbilitySystemComponent::EffectApplied);
 	
-	const FMyGameplayTags& GameplayTags = FMyGameplayTags::Get();
-	GEngine->AddOnScreenDebugMessage(
-		-1, 
-		10.f, 
-		FColor::Orange, 
-		FString::Printf(TEXT("Tag: %s"), * GameplayTags.Attributes_Secondary_Armor.ToString())
-		);
 }
 void UMyAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent,
                                               const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
