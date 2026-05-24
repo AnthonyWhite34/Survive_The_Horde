@@ -1,9 +1,3 @@
-Widget Steps
-1. Create WBP_FramedValue widget
-2. Create WBP_TextValueRow widget
-3. Create WBP_TextValueButtonRow widget
-4. Create WBP_AttributeMenu widget
-
 Attribute Menu
 1. First we need a UAttributeMenuWidgetController - set up to receive broadcast from the Ability System when attributes change.
 2. When we receive the attribute we need a way to figure out what the correct gameplay tag is. Associated with that gameplay attribute
