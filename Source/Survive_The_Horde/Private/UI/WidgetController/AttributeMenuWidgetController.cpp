@@ -11,11 +11,20 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 	UMyAttributeSet* AS = CastChecked<UMyAttributeSet>(AttributeSet);
 	
 	check(AttributeInfo);
-	FMyAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(FMyGameplayTags::Get().Attributes_Primary_Strength);
+	/*FMyAttributeInfo StrengthInfo = AttributeInfo->FindAttributeInfoForTag(FMyGameplayTags::Get().Attributes_Primary_Strength);
+	StrengthInfo.AttributeValue = AS->GetStrength();
+	AttributeInfoDelegate.Broadcast(StrengthInfo);
 	
-	Info.AttributeValue = AS->GetStrength();
+	FMyAttributeInfo IntelligenceInfo = AttributeInfo->FindAttributeInfoForTag(FMyGameplayTags::Get().Attributes_Primary_Intelligence);
+	IntelligenceInfo.AttributeValue = AS->GetIntelligence();
+	AttributeInfoDelegate.Broadcast(IntelligenceInfo);*/
 	
-	AttributeInfoDelegate.Broadcast(Info);
+	for (auto& Pair : AS->TagsToAttributes)
+	{
+		FMyAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Pair.Key);
+		Info.AttributeValue = Pair.Value().GetNumericValue(AS);
+		AttributeInfoDelegate.Broadcast(Info);
+	}
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
