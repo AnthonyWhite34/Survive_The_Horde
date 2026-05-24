@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "STH_HUD.generated.h"
 
+class UAttributeMenuWidgetController;
 class UMyUserWidget;
 class UAbilitySystemComponent;
 class UOverlayWidgetController;
@@ -17,15 +18,20 @@ class SURVIVE_THE_HORDE_API ASTH_HUD : public AHUD
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY()
-	TObjectPtr<UMyUserWidget> OverlayWidget;
+
 	
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 	
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
+	
+	UFUNCTION(BlueprintCallable, Category="AbilitySystem|WidgetController")
+	UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
 
 	
 private:
+	UPROPERTY()
+	TObjectPtr<UMyUserWidget> OverlayWidget;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UMyUserWidget> OverlayWidgetClass;
 
@@ -34,4 +40,11 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
+	
+
+	UPROPERTY()
+	TObjectPtr<UAttributeMenuWidgetController> AttributeMenuWidgetController;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UAttributeMenuWidgetController> AttributeMenuWidgetControllerClass;
 };

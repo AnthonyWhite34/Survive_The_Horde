@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "AbilitySystemLibrary.generated.h"
 
+class UAttributeMenuWidgetController;
 class UOverlayWidgetController;
 /**
  * 
@@ -19,5 +20,8 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="AbilitySystemLibrary|WidgetController")
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintPure, Category="AbilitySystemLibrary|WidgetController")
+	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 	
 };

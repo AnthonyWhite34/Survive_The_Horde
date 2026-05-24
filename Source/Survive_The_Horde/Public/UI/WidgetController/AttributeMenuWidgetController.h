@@ -9,11 +9,12 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class SURVIVE_THE_HORDE_API UAttributeMenuWidgetController : public UMyWidgetController
 {
 	GENERATED_BODY()
 	
+public:	
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
 };

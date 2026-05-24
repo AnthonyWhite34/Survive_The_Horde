@@ -4,6 +4,7 @@
 #include "UI/STH_HUD.h"
 
 #include "Blueprint/UserWidget.h"
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/Widgets/MyUserWidget.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
@@ -15,7 +16,6 @@ UOverlayWidgetController* ASTH_HUD::GetOverlayWidgetController(const FWidgetCont
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(WCParams);
 		OverlayWidgetController->BindCallbacksToDependencies();
-		return OverlayWidgetController;
 	}
 	return OverlayWidgetController;
 }
@@ -41,5 +41,16 @@ void ASTH_HUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 		Widget->AddToViewport();
 	}
 
+}
+
+UAttributeMenuWidgetController* ASTH_HUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return AttributeMenuWidgetController;
 }
 
