@@ -3,8 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/AttributeInfo.h"
 #include "UI/WidgetController/MyWidgetController.h"
 #include "AttributeMenuWidgetController.generated.h"
+
+class UAttributeInfo;
+struct FMyAttributeInfo;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const FMyAttributeInfo, Info);
 
 /**
  * 
@@ -17,4 +22,12 @@ class SURVIVE_THE_HORDE_API UAttributeMenuWidgetController : public UMyWidgetCon
 public:	
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
+	
+	UPROPERTY(BlueprintAssignable,Category="GAS|Attributes")
+	FAttributeInfoSignature AttributeInfoDelegate;
+	
+protected:
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAttributeInfo> AttributeInfo;
 };
