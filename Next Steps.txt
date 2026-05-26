@@ -1,13 +1,1 @@
-Attribute Menu
-1. First we need a UAttributeMenuWidgetController - set up to receive broadcast from the Ability System when attributes change.
-2. When we receive the attribute we need a way to figure out what the correct gameplay tag is. Associated with that gameplay attribute
- + Need a way to refence these tags in C++. Most likely will make a struct that stores a global source of tags for us. 
-3. Need a data asset capable of reviving gameplay tags and returning our attribute struct. that we need to make. 
-4. once we know the tag we will have the data to send up to the widgets. so broadcasting to widgets 
-Next Steps
-1. Create Secondary Attribute Gameplay Tags(handle tags better in C++)
-2. Create UAttributeInfo Data Asset
-3. Create FMyAttributeInfo struct 
-4. fill in the data asset for each attribute
-5. Create UAttributeMenuWidgetController
-Challenge
+Creating GameplayAbilities

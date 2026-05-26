@@ -3,6 +3,7 @@
 
 #include "Character/CharacterBase.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/MyAbilitySystemComponent.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase()
@@ -49,4 +50,13 @@ void ACharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
  	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
+}
+
+void ACharacterBase::AddCharacterAbilities()
+{
+	UMyAbilitySystemComponent* ASC = CastChecked<UMyAbilitySystemComponent>(AbilitySystemComponent);
+	if (!HasAuthority()) return;
+	
+	ASC->AddCharacterAbilities(StartupAbilities);
+	
 }

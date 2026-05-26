@@ -22,7 +22,6 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 	for (auto& Pair : AS->TagsToAttributes)
 	{
 		BroadcastAttributeInfo(Pair.Key,Pair.Value());
-
 	}
 }
 

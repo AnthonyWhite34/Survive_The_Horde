@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "Abilities/GameplayAbility.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
 #include "CharacterBase.generated.h"
@@ -11,6 +12,7 @@
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
+class UGameplayAbility;
 
 UCLASS()
 class SURVIVE_THE_HORDE_API ACharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -51,4 +53,9 @@ protected:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 	
 	void InitializeDefaultAttributes() const;
+	
+	void AddCharacterAbilities();
+private:
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>>	StartupAbilities;
 };
