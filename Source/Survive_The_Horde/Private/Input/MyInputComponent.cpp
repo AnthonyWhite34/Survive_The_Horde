@@ -3,6 +3,3 @@
 
 #include "Input/MyInputComponent.h"
 
-void UMyInputComponent::BindabilityActions(const UMyInputConfig* InputConfig)
-{
-}

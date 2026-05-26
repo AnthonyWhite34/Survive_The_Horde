@@ -15,15 +15,16 @@ class SURVIVE_THE_HORDE_API UMyInputComponent : public UEnhancedInputComponent
 {
 	GENERATED_BODY()
 	
+public:
 	//create a function that we can use on our Player controller so we can bind callbacks. and i want the callbacks to be paramaters to those callbacks
 	template<class UserClass, typename PressedFuncType, typename ReleaseFuncType, typename HeldFuncType>
-	void BindabilityActions(const UMyInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleaseFuncType ReleasedFunc, HeldFuncType HeldFunc);
+	void BindAbilityActions(const UMyInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleaseFuncType ReleasedFunc, HeldFuncType HeldFunc);
 	
 	
 };
 
 template <class UserClass, typename PressedFuncType, typename ReleaseFuncType, typename HeldFuncType>
-void UMyInputComponent::BindabilityActions(const UMyInputConfig* InputConfig, UserClass* Object,
+void UMyInputComponent::BindAbilityActions(const UMyInputConfig* InputConfig, UserClass* Object,
 	PressedFuncType PressedFunc, ReleaseFuncType ReleasedFunc, HeldFuncType HeldFunc)
 {
 	check(InputConfig);
