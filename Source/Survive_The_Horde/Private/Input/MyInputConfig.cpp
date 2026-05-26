@@ -8,7 +8,7 @@ const UInputAction* UMyInputConfig::FindAbilityInputActionForTag(const FGameplay
 	for (const FMyInputAction& Input : AbilityInputActions)
 	{
 		//Input.InputAction && Action.InputTag == InputTag
-		if (Input.InputTag.MatchesTagExact(InputTag))
+		if (Input.InputAction && Input.InputTag == InputTag)
 		{
 			return Input.InputAction;
 		}

@@ -27,7 +27,11 @@ template <class UserClass, typename PressedFuncType, typename ReleaseFuncType, t
 void UMyInputComponent::BindAbilityActions(const UMyInputConfig* InputConfig, UserClass* Object,
 	PressedFuncType PressedFunc, ReleaseFuncType ReleasedFunc, HeldFuncType HeldFunc)
 {
-	check(InputConfig);
+	if (!InputConfig)
+	{
+		UE_LOG(LogTemp, Error, TEXT("BindAbilityActions failed: InputConfig is null"));
+		return;
+	}
 	
 	for (const FMyInputAction& Action : InputConfig->AbilityInputActions)
 	{
@@ -42,6 +46,7 @@ void UMyInputComponent::BindAbilityActions(const UMyInputConfig* InputConfig, Us
 			if (ReleasedFunc)
 			{
 				BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Action.InputTag);
+				BindAction(Action.InputAction, ETriggerEvent::Canceled, Object, ReleasedFunc, Action.InputTag);
 			}
 			
 			if (HeldFunc)
