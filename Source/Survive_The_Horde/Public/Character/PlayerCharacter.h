@@ -13,8 +13,44 @@ UCLASS()
 class SURVIVE_THE_HORDE_API APlayerCharacter : public ACharacterBase
 {
 	GENERATED_BODY()
-	
+public:
 	APlayerCharacter();
+	
+	virtual void Tick(float DeltaSeconds) override;
+	
+	UFUNCTION(BlueprintCallable, Category="Movement")
+	void SetUseMouseFacing(bool bInUseMouseFacing);
+	
+	UFUNCTION(BlueprintCallable, Category="Movement")
+	void SetMovementSpeedMultiplier(float InMultiplier);
+	
+	UFUNCTION(BlueprintCallable, Category="Movement") 
+	void SetMouseFacingTarget(const FVector& WorldTargetLocation);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float TopDownMaxWalkSpeed = 600.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float TopDownMaxAcceleration = 2200.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float TopDownBrakingDeceleration = 1800.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float TopDownGroundFriction = 6.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float TopDownRotationRateYaw = 900.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float MouseFacingInterpSpeed = 12.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float MinSpeedMultiplier = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
+	float MaxSpeedMultiplier = 2.f;
 	
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
@@ -26,4 +62,11 @@ class SURVIVE_THE_HORDE_API APlayerCharacter : public ACharacterBase
 private:
 	virtual void InitAbilityActorInfo() override;
 	
+	void ApplyTopDownMovementTuning();
+	void UpdateMouseFacing(float DeltaSeconds);
+
+	bool bUseMouseFacing = false;
+	float MovementSpeedMultiplier = 1.f;
+	FVector CachedMouseFacingTarget = FVector::ZeroVector;
+	bool bHasMouseFacingTarget = false;
 };

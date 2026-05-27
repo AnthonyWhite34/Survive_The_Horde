@@ -15,14 +15,41 @@ class AMyPlayerState;
 
 APlayerCharacter::APlayerCharacter()
 {
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f,400.f, 0.f);
+	PrimaryActorTick.bCanEverTick = true;
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	ApplyTopDownMovementTuning();
 	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+}
+
+void APlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	UpdateMouseFacing(DeltaSeconds);
+}
+
+void APlayerCharacter::SetUseMouseFacing(bool bInUseMouseFacing)
+{
+	bUseMouseFacing = bInUseMouseFacing;
+}
+
+void APlayerCharacter::SetMovementSpeedMultiplier(float InMultiplier)
+{
+	MovementSpeedMultiplier = FMath::Clamp(InMultiplier, MinSpeedMultiplier, MaxSpeedMultiplier);
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->MaxWalkSpeed = TopDownMaxWalkSpeed * MovementSpeedMultiplier;
+	}
+}
+
+void APlayerCharacter::SetMouseFacingTarget(const FVector& WorldTargetLocation)
+{
+	CachedMouseFacingTarget = WorldTargetLocation;
+	bHasMouseFacingTarget = true;
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -68,4 +95,37 @@ void APlayerCharacter::InitAbilityActorInfo()
 		}
 	}
 	InitializeDefaultAttributes();
+}
+
+void APlayerCharacter::ApplyTopDownMovementTuning()
+{
+	UCharacterMovementComponent* MoveComp = GetCharacterMovement();
+	if (!MoveComp) return;
+
+	MoveComp->bOrientRotationToMovement = true;
+	MoveComp->bUseControllerDesiredRotation = false;
+	MoveComp->RotationRate = FRotator(0.f, TopDownRotationRateYaw, 0.f);
+	MoveComp->MaxWalkSpeed = TopDownMaxWalkSpeed;
+	MoveComp->MaxAcceleration = TopDownMaxAcceleration;
+	MoveComp->BrakingDecelerationWalking = TopDownBrakingDeceleration;
+	MoveComp->GroundFriction = TopDownGroundFriction;
+}
+
+void APlayerCharacter::UpdateMouseFacing(float DeltaSeconds)
+{
+	if (!bUseMouseFacing || !bHasMouseFacingTarget)
+	{
+		return;
+	}
+
+	FVector ToTarget = CachedMouseFacingTarget - GetActorLocation();
+	ToTarget.Z = 0.f;
+	if (ToTarget.IsNearlyZero())
+	{
+		return;
+	}
+
+	const FRotator TargetRotation = ToTarget.Rotation();
+	const FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaSeconds, MouseFacingInterpSpeed);
+	SetActorRotation(NewRotation);
 }

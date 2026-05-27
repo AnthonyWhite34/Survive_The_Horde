@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "AbilitySystem/MyAbilitySystemComponent.h"
+#include "Character/PlayerCharacter.h"
 #include "Input/MyInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
@@ -22,6 +23,15 @@ void APlayerCharacterController::PlayerTick(float DeltaTime)
 	
 	CursorTrace();
 	
+	FHitResult CursorHit;
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	if (CursorHit.bBlockingHit)
+	{
+		if (APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
+		{
+			PlayerCharacter->SetMouseFacingTarget(CursorHit.ImpactPoint);
+		}
+	}
 }
 
 void APlayerCharacterController::CursorTrace()
