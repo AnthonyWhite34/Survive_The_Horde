@@ -4,6 +4,7 @@
 
 #include "Character/PlayerCharacter.h"
 
+#include "Net/UnrealNetwork.h"
 #include "AbilitySystemComponent.h"
 #include "Player/MyPlayerState.h"
 #include "Player/PlayerCharacterController.h"
@@ -32,18 +33,30 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	UpdateMouseFacing(DeltaSeconds);
 }
 
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APlayerCharacter, bUseMouseFacing);
+	DOREPLIFETIME(APlayerCharacter, bMovementLockedByAbility);
+	DOREPLIFETIME(APlayerCharacter, MovementSpeedMultiplier);
+}
+
 void APlayerCharacter::SetUseMouseFacing(bool bInUseMouseFacing)
 {
 	bUseMouseFacing = bInUseMouseFacing;
 }
 
+void APlayerCharacter::SetMovementLockedByAbility(bool bLocked)
+{
+	bMovementLockedByAbility = bLocked;
+	OnRep_MovementLockedByAbility();
+}
+
 void APlayerCharacter::SetMovementSpeedMultiplier(float InMultiplier)
 {
 	MovementSpeedMultiplier = FMath::Clamp(InMultiplier, MinSpeedMultiplier, MaxSpeedMultiplier);
-	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
-	{
-		MoveComp->MaxWalkSpeed = TopDownMaxWalkSpeed * MovementSpeedMultiplier;
-	}
+	OnRep_MovementSpeedMultiplier();
 }
 
 void APlayerCharacter::SetMouseFacingTarget(const FVector& WorldTargetLocation)
@@ -78,6 +91,31 @@ int32 APlayerCharacter::GetPlayerLevel()
 	return MyPlayerState->GetPlayerLevel();
 }
 
+void APlayerCharacter::OnRep_UseMouseFacing()
+{
+	if (!bUseMouseFacing)
+	{
+		bHasMouseFacingTarget = false;
+	}
+}
+
+void APlayerCharacter::OnRep_MovementSpeedMultiplier()
+{
+	ApplyMovementSpeed();
+}
+
+void APlayerCharacter::OnRep_MovementLockedByAbility()
+{
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->DisableMovement();
+		if (!bMovementLockedByAbility)
+		{
+			MoveComp->SetMovementMode(EMovementMode::MOVE_Walking);
+		}
+	}
+}
+
 void APlayerCharacter::InitAbilityActorInfo()
 {
 	AMyPlayerState* MyPlayerState = GetPlayerState<AMyPlayerState>();
@@ -105,10 +143,18 @@ void APlayerCharacter::ApplyTopDownMovementTuning()
 	MoveComp->bOrientRotationToMovement = true;
 	MoveComp->bUseControllerDesiredRotation = false;
 	MoveComp->RotationRate = FRotator(0.f, TopDownRotationRateYaw, 0.f);
-	MoveComp->MaxWalkSpeed = TopDownMaxWalkSpeed;
+	ApplyMovementSpeed();
 	MoveComp->MaxAcceleration = TopDownMaxAcceleration;
 	MoveComp->BrakingDecelerationWalking = TopDownBrakingDeceleration;
 	MoveComp->GroundFriction = TopDownGroundFriction;
+}
+
+void APlayerCharacter::ApplyMovementSpeed()
+{
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
+	{
+		MoveComp->MaxWalkSpeed = TopDownMaxWalkSpeed * MovementSpeedMultiplier;
+	}
 }
 
 void APlayerCharacter::UpdateMouseFacing(float DeltaSeconds)

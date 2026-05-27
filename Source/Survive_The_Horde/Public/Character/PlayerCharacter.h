@@ -17,9 +17,16 @@ public:
 	APlayerCharacter();
 	
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	UFUNCTION(BlueprintCallable, Category="Movement")
 	void SetUseMouseFacing(bool bInUseMouseFacing);
+	
+	UFUNCTION(BlueprintCallable, Category="Movement")
+	void SetMovementLockedByAbility(bool bLocked);
+
+	UFUNCTION(BlueprintPure, Category="Movement")
+	bool IsMovementLockedByAbility() const { return bMovementLockedByAbility; }
 	
 	UFUNCTION(BlueprintCallable, Category="Movement")
 	void SetMovementSpeedMultiplier(float InMultiplier);
@@ -41,7 +48,7 @@ protected:
 	float TopDownGroundFriction = 6.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
-	float TopDownRotationRateYaw = 900.f;
+	float TopDownRotationRateYaw = 600.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Movement|Tuning")
 	float MouseFacingInterpSpeed = 12.f;
@@ -60,12 +67,28 @@ protected:
 	/* End Combat Interface */
 	
 private:
+	UFUNCTION()
+	void OnRep_UseMouseFacing();
+
+	UFUNCTION()
+	void OnRep_MovementSpeedMultiplier();
+
+	UFUNCTION()
+	void OnRep_MovementLockedByAbility();
+
 	virtual void InitAbilityActorInfo() override;
 	
 	void ApplyTopDownMovementTuning();
+	void ApplyMovementSpeed();
 	void UpdateMouseFacing(float DeltaSeconds);
 
-	bool bUseMouseFacing = false;
+	UPROPERTY(ReplicatedUsing=OnRep_UseMouseFacing, EditAnywhere, Category="Movement")
+	bool bUseMouseFacing = true;
+
+	UPROPERTY(ReplicatedUsing=OnRep_MovementLockedByAbility, EditAnywhere, Category="Movement")
+	bool bMovementLockedByAbility = false;
+
+	UPROPERTY(ReplicatedUsing=OnRep_MovementSpeedMultiplier, EditAnywhere, Category="Movement")
 	float MovementSpeedMultiplier = 1.f;
 	FVector CachedMouseFacingTarget = FVector::ZeroVector;
 	bool bHasMouseFacingTarget = false;
