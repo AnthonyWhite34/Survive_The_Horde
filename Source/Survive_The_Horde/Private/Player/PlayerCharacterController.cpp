@@ -142,6 +142,13 @@ void APlayerCharacterController::SetupInputComponent()
 
 void APlayerCharacterController::Move(const FInputActionValue& InputActionValue)
 {
+	if (const APlayerCharacter* PlayerCharacter = GetPawn<APlayerCharacter>())
+	{
+		if (PlayerCharacter->IsMovementLockedByAbility())
+		{
+			return;
+		}
+	}
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);

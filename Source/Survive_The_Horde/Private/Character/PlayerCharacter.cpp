@@ -45,6 +45,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void APlayerCharacter::SetUseMouseFacing(bool bInUseMouseFacing)
 {
 	bUseMouseFacing = bInUseMouseFacing;
+	OnRep_UseMouseFacing();
 }
 
 void APlayerCharacter::SetMovementLockedByAbility(bool bLocked)
@@ -108,8 +109,12 @@ void APlayerCharacter::OnRep_MovementLockedByAbility()
 {
 	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
-		MoveComp->DisableMovement();
-		if (!bMovementLockedByAbility)
+		if (bMovementLockedByAbility)
+		{
+			MoveComp->StopMovementImmediately();
+			MoveComp->DisableMovement();
+		}
+		else
 		{
 			MoveComp->SetMovementMode(EMovementMode::MOVE_Walking);
 		}
@@ -159,19 +164,14 @@ void APlayerCharacter::ApplyMovementSpeed()
 
 void APlayerCharacter::UpdateMouseFacing(float DeltaSeconds)
 {
-	if (!bUseMouseFacing || !bHasMouseFacingTarget)
+	if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
 	{
-		return;
+		MoveComp->bOrientRotationToMovement = !bUseMouseFacing;
+		MoveComp->bUseControllerDesiredRotation = false;
 	}
 
-	FVector ToTarget = CachedMouseFacingTarget - GetActorLocation();
-	ToTarget.Z = 0.f;
-	if (ToTarget.IsNearlyZero())
+	if (!bUseMouseFacing)
 	{
-		return;
+		bHasMouseFacingTarget = false;
 	}
-
-	const FRotator TargetRotation = ToTarget.Rotation();
-	const FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaSeconds, MouseFacingInterpSpeed);
-	SetActorRotation(NewRotation);
 }
