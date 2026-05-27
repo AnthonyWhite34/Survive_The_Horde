@@ -4,6 +4,7 @@
 #include "AbilitySystem/MyAbilitySystemComponent.h"
 
 #include "MyGameplayTags.h"
+#include "AbilitySystem/Abilities/MyGameplayAbility.h"
 
 UMyAbilitySystemComponent::UMyAbilitySystemComponent()
 {
@@ -18,11 +19,51 @@ void UMyAbilitySystemComponent::AbilityActorInfoSet()
 
 void UMyAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
-	for (TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
-	{
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+	{	
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-		//GiveAbility(AbilitySpec);
-		GiveAbilityAndActivateOnce(AbilitySpec);
+		if (const UMyGameplayAbility* MyAbility = Cast<UMyGameplayAbility>(AbilitySpec.Ability))
+		{
+			//AbilitySpec.DynamicAbilityTags.AddTag(MyAbility->StartupInputTag);
+			AbilitySpec.GetDynamicSpecSourceTags().AddTag(MyAbility->StartupInputTag);
+			GiveAbility(AbilitySpec);
+		}
+	}
+}
+
+void UMyAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid())
+	{
+		return;
+	}
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		//if(AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		if (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		{
+			
+			AbilitySpecInputPressed(AbilitySpec);
+			if (!AbilitySpec.IsActive())
+			{
+				TryActivateAbility(AbilitySpec.Handle);
+			}
+		}
+	}
+}
+
+void UMyAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid())
+	{
+		return;
+	}
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		{
+			AbilitySpecInputReleased(AbilitySpec);
+		}
 	}
 }
 

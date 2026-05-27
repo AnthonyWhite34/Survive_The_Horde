@@ -3,8 +3,10 @@
 
 #include "Player/PlayerCharacterController.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "AbilitySystem/MyAbilitySystemComponent.h"
 #include "Input/MyInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
@@ -75,17 +77,28 @@ void APlayerCharacterController::CursorTrace()
 
 void APlayerCharacterController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(1, 3.0f, FColor::Red, *InputTag.ToString());
+	
 }
 
 void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(2, 3.0f, FColor::Blue, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagReleased(InputTag);
 }
 
 void APlayerCharacterController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 3.0f, FColor::Green, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagHeld(InputTag);
+}
+
+UMyAbilitySystemComponent* APlayerCharacterController::GetASC()
+{
+	if (MyAbilitySystemComponent == nullptr)
+	{
+		MyAbilitySystemComponent = Cast<UMyAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return MyAbilitySystemComponent;
 }
 
 void APlayerCharacterController::BeginPlay()

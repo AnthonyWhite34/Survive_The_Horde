@@ -14,4 +14,8 @@ class SURVIVE_THE_HORDE_API UMyGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
+public:
+	
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	FGameplayTag StartupInputTag;
 };

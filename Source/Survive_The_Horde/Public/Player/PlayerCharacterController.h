@@ -12,6 +12,7 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class IEnemyInterface;
+class UMyAbilitySystemComponent;
 /**
  * 
  */
@@ -49,5 +50,11 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UMyInputConfig> InputConfig;
+	
+	UPROPERTY()
+	TObjectPtr<UMyAbilitySystemComponent> MyAbilitySystemComponent;
+	
+	UFUNCTION()
+	UMyAbilitySystemComponent* GetASC();
 
 };
