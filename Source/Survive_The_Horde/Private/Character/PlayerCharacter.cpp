@@ -173,5 +173,22 @@ void APlayerCharacter::UpdateMouseFacing(float DeltaSeconds)
 	if (!bUseMouseFacing)
 	{
 		bHasMouseFacingTarget = false;
+		return;
 	}
+
+	if (!bHasMouseFacingTarget)
+	{
+		return;
+	}
+
+	FVector ToTarget = CachedMouseFacingTarget - GetActorLocation();
+	ToTarget.Z = 0.f;
+	if (ToTarget.IsNearlyZero())
+	{
+		return;
+	}
+
+	const FRotator TargetRotation = ToTarget.Rotation();
+	const FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), FRotator(0.f, TargetRotation.Yaw, 0.f), DeltaSeconds, MouseFacingInterpSpeed);
+	SetActorRotation(NewRotation);
 }

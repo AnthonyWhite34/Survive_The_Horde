@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintPure, Category="Movement")
 	bool IsMovementLockedByAbility() const { return bMovementLockedByAbility; }
 	
+	UFUNCTION(BlueprintPure, Category="Movement")
+	bool IsUsingMouseFacing() const { return bUseMouseFacing; }
+	
 	UFUNCTION(BlueprintCallable, Category="Movement")
 	void SetMovementSpeedMultiplier(float InMultiplier);
 	
