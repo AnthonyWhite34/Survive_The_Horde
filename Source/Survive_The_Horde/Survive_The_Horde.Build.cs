@@ -28,7 +28,8 @@ public class Survive_The_Horde : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
 			"GameplayTags",
-			"GameplayTasks"
+			"GameplayTasks",
+			"NavigationSystem"
 		});
 
 		PublicIncludePaths.AddRange(new string[] {
