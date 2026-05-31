@@ -101,7 +101,7 @@ void APlayerCharacterController::CursorTrace()
 
 void APlayerCharacterController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	if (!InputTag.MatchesTagExact(FMyGameplayTags::Get().InputTag_LMB))
+	if (InputTag.MatchesTagExact(FMyGameplayTags::Get().InputTag_LMB))
 	{
 		bTargeting = ThisActor ? true : false;
 		bAutoRunning = false;
@@ -123,7 +123,7 @@ void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 	{
 		if (GetASC())
 		{
-			GetASC()->AbilityInputTagHeld(InputTag);
+			GetASC()->AbilityInputTagReleased(InputTag);
 		}
 		
 	}
