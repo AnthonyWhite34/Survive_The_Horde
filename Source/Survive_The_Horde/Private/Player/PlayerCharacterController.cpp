@@ -50,52 +50,16 @@ void APlayerCharacterController::AutoRun()
 
 void APlayerCharacterController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 	
 	LastActor = ThisActor;
 	ThisActor = CursorHit.GetActor();
 	
-	/**
-	 *Line trace from cursor. There are several scenarios: 
-	 * A. LastActor is null && ThisActor is nul 
-	 *  - do nothing.
-	 *  B. LastActor is null && ThisActor is valid
-	 *		-Highlight ThisActor
-	 *		C. LastActor is valid && ThisActor is null
-			-Unhighlight this actor. 
-	 */
-	if (LastActor == nullptr)
+	if (LastActor != ThisActor)
 	{
-		if (ThisActor != nullptr)
-		{
-			ThisActor->HighlightActor();
-		}
-		else
-		{
-			
-		}
-	}
-	else
-	{
-		if (ThisActor == nullptr)
-		{
-			LastActor->UnHighlightActor();
-		}
-		else
-		{
-			if (LastActor != ThisActor)
-			{
-				LastActor->UnHighlightActor();
-				ThisActor->HighlightActor();
-			}
-			else
-			{
-				
-			}
-		}
-	
+		if (LastActor) { LastActor->UnHighlightActor(); }
+		if (ThisActor) { ThisActor->HighlightActor(); }
 	}
 }
 
@@ -113,10 +77,7 @@ void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
 	if (!InputTag.MatchesTagExact(FMyGameplayTags::Get().InputTag_LMB))
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		if (GetASC()) { GetASC()->AbilityInputTagReleased(InputTag); }
 		return;
 	}
 	if (bTargeting)
@@ -173,10 +134,9 @@ void APlayerCharacterController::AbilityInputTagHeld(FGameplayTag InputTag)
 	{
 		FollowTime += GetWorld()->GetDeltaSeconds();
 		
-		FHitResult Hit; 
-		if (GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+		if (CursorHit.bBlockingHit)
 		{
-			CachedDestination = Hit.ImpactPoint;
+			CachedDestination = CursorHit.ImpactPoint;
 		}
 		
 		if (APawn* ControlledPawn = GetPawn())
