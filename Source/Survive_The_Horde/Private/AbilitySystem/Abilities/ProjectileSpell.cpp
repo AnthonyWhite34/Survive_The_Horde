@@ -3,7 +3,9 @@
 
 #include "AbilitySystem/Abilities/ProjectileSpell.h"
 
-#include "Kismet/KismetSystemLibrary.h"
+#include "Actor/MyProjectile.h"
+#include "Interaction/CombatInterface.h"
+
 
 void UProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                        const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
@@ -11,5 +13,26 @@ void UProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
-	UKismetSystemLibrary::PrintString(this, FString("ActivateAbility(C++)"), true, true, FLinearColor::Yellow, 3);
+	const bool bIsServer = HasAuthority(&ActivationInfo);
+	
+	if (!bIsServer)  return;
+	
+	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
+	if (CombatInterface)
+	{
+		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		
+		FTransform SpawnTransform;
+		SpawnTransform.SetLocation(SocketLocation);
+		AMyProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMyProjectile>(
+			ProjectileClass, 
+			SpawnTransform,
+			GetOwningActorFromActorInfo(), 
+			Cast<APawn>(GetOwningActorFromActorInfo()), 
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		
+		//TODO: Give the Projectile a Gameplay Effect Spec for Causing Damage. 
+		
+		Projectile->FinishSpawning(SpawnTransform);
+	}
 }

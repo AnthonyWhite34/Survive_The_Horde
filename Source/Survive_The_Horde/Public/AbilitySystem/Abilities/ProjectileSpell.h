@@ -6,6 +6,7 @@
 #include "AbilitySystem/Abilities/MyGameplayAbility.h"
 #include "ProjectileSpell.generated.h"
 
+class AMyProjectile;
 /**
  * 
  */
@@ -16,4 +17,7 @@ class SURVIVE_THE_HORDE_API UProjectileSpell : public UMyGameplayAbility
 	
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AMyProjectile> ProjectileClass;
 };
