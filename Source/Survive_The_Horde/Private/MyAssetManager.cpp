@@ -3,7 +3,7 @@
 
 #include "MyAssetManager.h"
 #include "MyGameplayTags.h"
-#include "AbilitySystem/MyAbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 
 UMyAssetManager& UMyAssetManager::Get()
 {
@@ -20,3 +20,4 @@ void UMyAssetManager::StartInitialLoading()
 	
 	//This is required to use TargetData
 	UAbilitySystemGlobals::Get().InitGlobalData();
+}
