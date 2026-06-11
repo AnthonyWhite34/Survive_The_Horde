@@ -13,7 +13,13 @@ void UProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
-	const bool bIsServer = HasAuthority(&ActivationInfo);
+
+}
+
+void UProjectileSpell::SpawnProjectile()
+{
+	
+	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	
 	if (!bIsServer)  return;
 	
