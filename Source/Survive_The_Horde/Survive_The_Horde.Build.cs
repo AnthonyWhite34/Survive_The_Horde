@@ -21,7 +21,8 @@ public class Survive_The_Horde : ModuleRules
 			"UMG",
 			"Slate",
 			"GameplayTags",
-			"GameplayTasks"
+			"GameplayTasks",
+			"Niagara"
 		});
 
 		

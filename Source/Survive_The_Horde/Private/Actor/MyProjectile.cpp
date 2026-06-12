@@ -4,7 +4,9 @@
 #include "Actor/MyProjectile.h"
 
 #include "Components/SphereComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AMyProjectile::AMyProjectile()
 {
@@ -32,8 +34,28 @@ void AMyProjectile::BeginPlay()
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AMyProjectile::OnSphereOverlap);
 }
 
-void AMyProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AMyProjectile::Destroyed()
 {
+	if (!bHit && !HasAuthority()) 
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	}
+	Super::Destroyed();
+}
+
+void AMyProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	
+	if (HasAuthority())
+	{
+		Destroy();
+	} else
+	{
+		bHit = true;
+	}
 }
 
