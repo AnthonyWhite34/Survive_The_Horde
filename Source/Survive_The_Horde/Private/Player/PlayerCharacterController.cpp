@@ -80,17 +80,12 @@ void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 		if (GetASC()) { GetASC()->AbilityInputTagReleased(InputTag); }
 		return;
 	}
-	if (bTargeting)
+	
+	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
+	
+	if (!bTargeting || !bShiftKeyDown)
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
-		
-	}
-	else
-	{
-		APawn* ControlledPawn = GetPawn();
+		const APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressedThreshold && ControlledPawn)
 		{
 			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
@@ -99,10 +94,9 @@ void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 				for (const FVector& PointLoc : NavPath->PathPoints)
 				{
 					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Green, false, 5.f);
+					//DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Green, false, 5.f);
 				}
 				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
-				
 				bAutoRunning = true;
 			}
 		}
@@ -122,7 +116,7 @@ void APlayerCharacterController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 	
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC())
 		{
@@ -184,7 +178,10 @@ void APlayerCharacterController::SetupInputComponent()
 	
 	UMyInputComponent* MyInputComponent = CastChecked<UMyInputComponent>(InputComponent);
 	MyInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
+	MyInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &APlayerCharacterController::ShiftPressed);
+	MyInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &APlayerCharacterController::ShiftReleased);
 	MyInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
+	
 }
 
 void APlayerCharacterController::Move(const FInputActionValue& InputActionValue)
