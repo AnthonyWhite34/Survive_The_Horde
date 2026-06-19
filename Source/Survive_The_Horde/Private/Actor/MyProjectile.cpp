@@ -3,6 +3,8 @@
 
 #include "Actor/MyProjectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Components/SphereComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Survive_The_Horde.h"
@@ -60,6 +62,12 @@ void AMyProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	
 	if (HasAuthority())
 	{
+		
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
+		
 		Destroy();
 	} else
 	{
