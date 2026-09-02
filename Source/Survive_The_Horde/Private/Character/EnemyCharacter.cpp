@@ -6,6 +6,8 @@
 #include "Survive_The_Horde.h"
 #include "AbilitySystem/MyAbilitySystemComponent.h"
 #include "AbilitySystem/MyAttributeSet.h"
+#include "Chaos/Deformable/MuscleActivationConstraints.h"
+#include "Components/WidgetComponent.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -16,6 +18,10 @@ AEnemyCharacter::AEnemyCharacter()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
 	AttributeSet = CreateDefaultSubobject<UMyAttributeSet>("AttributeSet");
+	
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
+	HealthBar->SetupAttachment(GetRootComponent());
+	
 }
 
 void AEnemyCharacter::HighlightActor()
@@ -40,6 +46,31 @@ int32 AEnemyCharacter::GetPlayerLevel()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	InitAbilityActorInfo();
+	
+	
+	if (UMyUserWidget* MyUserWidget = Cast<UMyUserWidget>(HealthBar->GetUserWidgetObject()))
+	{
+		MyUserWidget->SetWidgetController(this);
+	}
+	
+	if (const UMyAttributeSet* AS = Cast<UMyAttributeSet>(AttributeSet))
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AS->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data) 
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}
+		);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AS->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data) 
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			}
+		);
+		OnHealthChanged.Broadcast(AS->GetHealth());
+		OnMaxHealthChanged.Broadcast(AS->GetMaxHealth());
+	}
 	
 	
 }
