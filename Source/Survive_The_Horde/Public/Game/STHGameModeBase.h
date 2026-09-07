@@ -9,9 +9,15 @@
 /**
  * 
  */
+class UCharacterClassInfo;
+
 UCLASS()
 class SURVIVE_THE_HORDE_API ASTHGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defualts")
+	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
 	
 };

@@ -4,6 +4,7 @@
 #include "Character/EnemyCharacter.h"
 
 #include "Survive_The_Horde.h"
+#include "AbilitySystem/AbilitySystemLibrary.h"
 #include "AbilitySystem/MyAbilitySystemComponent.h"
 #include "AbilitySystem/MyAttributeSet.h"
 #include "Chaos/Deformable/MuscleActivationConstraints.h"
@@ -81,5 +82,10 @@ void AEnemyCharacter::InitAbilityActorInfo()
 	Cast<UMyAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	
 	InitializeDefaultAttributes();
+}
+
+void AEnemyCharacter::InitializeDefaultAttributes() const
+{
+	UAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
 

@@ -31,6 +31,7 @@ class SURVIVE_THE_HORDE_API UCharacterClassInfo : public UDataAsset
 {
 	GENERATED_BODY()
 	
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TMap<ECharacterClass, FCharacterClassDefaultInfo> CharacterClassInformation;
 	

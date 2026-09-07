@@ -6,6 +6,7 @@
 #include "CharacterBase.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "EnemyCharacter.generated.h"
 
 class UWidgetComponent;
@@ -37,14 +38,18 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlighted = false;
+protected:	
 	
 	virtual void BeginPlay() override;
-	
 	virtual void InitAbilityActorInfo() override;
+	virtual void InitializeDefaultAttributes() const override;
 	
-protected:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWRite, Category = "Character Class Defaults")
-    	int32 Level = 1;
+    int32 Level = 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWRite, Category = "Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
